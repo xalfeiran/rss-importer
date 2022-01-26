@@ -52,6 +52,20 @@ class PodcastsController extends Controller
                     $podcast_episodes = PodcastEpisodesController::replace_all($podcast, $podcast_episodes);
                 }
             }
+
+            return $podcast;
         }
+    }
+
+    // sample method to call the podcast creation from a request
+    public function createFromRequest(Request $request)
+    {
+        // get the podcast information
+        $podcast_url = $request->podcast_url;
+        // call the podcast creation
+        $podcast = $this->create($podcast_url);
+
+        // return a json response
+        return response()->json($podcast);
     }
 }

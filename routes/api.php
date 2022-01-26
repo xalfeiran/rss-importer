@@ -18,3 +18,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// sample call for the podcast creation from a request
+Route::post('/podcasts/create', 'App\Http\Controllers\PodcastsController@createFromRequest');
