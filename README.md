@@ -1,65 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## RSS Importer
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is my approach to solve a request to have podcasts rss urls and parse the xml into a database.
 
-## About Laravel
+I used <a href="https://github.com/docker-php/docker-php">docker-php</a> project as a base to met the requirement for the test
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<h3>Versions</h3>
+<ul>
+  <li>Docker desktop ver 4.3.0</li>
+  <li>Compose ver 1.29.2</li>
+  <li>PHP ver 8.1.0</li>
+  <li>MySQL ver 8.0.27</li>
+  <li>nginx ver 1.21.4</li>
+  <li>Laravel 8</li>
+</ul>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<h3>Tools used</h3>
+<ul>
+    <li>VS Code</li>
+    <li>Chrome Browser</li>
+    <li>Macbook Pro with Catalina OS</li>
+</ul>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Install
 
-## Learning Laravel
+Get the code
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+<code>git clone https://github.com/xalfeiran/rss-importer.git</code>
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Run Laravel sail
 
-## Laravel Sponsors
+<code>./vendor/bin/sail up</code>
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Setup Database settings in .env file
 
-### Premium Partners
+Run migrations
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-- **[Romega Software](https://romegasoftware.com)**
+<code>php artisan migrate</code>
 
-## Contributing
+## Use
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The project is made to be called by artisan command (but prepared to adapt the controllers to be called from a api 
 
-## Code of Conduct
+Sample calls
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+To test if the provided url returns a valid podcast xml<br/>
+<code>php artisan command:test-podcast-url https://nosleeppodcast.libsyn.com/rss</code>
 
-## Security Vulnerabilities
+To test if the provided url returns a list of episodes<br/>
+<code>php artisan command:test-podcast-episodes-url https://nosleeppodcast.libsyn.com/rss</code>
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Run the actual import<br/>
+<code>php artisan command:import-podcast-to-library https://feeds.megaphone.fm/stuffyoushouldknow</code>
+Sample output
+<code>Podcast information loaded
+Took 10 seconds</code>
+
+## What's next
+
+Other than calling this process by command line, it may be needed to make a call using a api to the sample code provides a good start
+
+create a route in the api.php file<br/>
+<code>Route::post('/podcasts/create', 'App\Http\Controllers\PodcastsController@createFromRequest');</code>
+
+Review the PodcastController on the createFromRequest method<br/>
+<code>
+    // sample method to call the podcast creation from a request
+    public function createFromRequest(Request $request)
+    {
+        // get the podcast information
+        $podcast_url = $request->podcast_url;
+        // call the podcast creation
+        $podcast = $this->create($podcast_url);
+
+        // return a json response
+        return response()->json($podcast);
+    }
+</code>
+
+Make a call from let's say Postman to: <code>http://localhost/api/podcasts/create</code>
+
+
+
+
 
 ## License
 
