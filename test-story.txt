@@ -1,0 +1,177 @@
+Creation of project structure
+Already have Docker installed
+
+Create project using laravel sail
+curl -s "https://laravel.build/podchaser-test" | bash
+
+Get Laravel empty project running
+cd podchaser-test && ./vendor/bin/sail up
+
+Check everything is setup correctly (it is, but i found out that is a good practice to see if initial config is ok)
+
+sh-4.4# mysql -V
+mysql  Ver 8.0.27 for Linux on x86_64 (MySQL Community Server - GPL)
+
+# php -v
+PHP 8.1.0 (cli) (built: Nov 25 2021 20:22:22) (NTS)
+
+Step creating model and table structure
+
+Podcast general record
+# php artisan make:model Podcast
+Model created successfully.
+App\Models\Podcast.php
+
+Podcast episode model and table structure
+# php artisan make:model PodcastEpisode
+Model created successfully.
+App\Models\PodcastEpisode.php
+
+Create migrations for tables
+# php artisan make:migration create_podcasts_table
+Created Migration: 2022_01_26_034236_create_podcasts_table
+Table name : podcasts
+Migration file database\migrations\2022_01_26_034236_create_podcasts_table.php
+
+# php artisan make:migration create_podcast_episodes_table
+Created Migration: 2022_01_26_035047_create_podcast_episodes_table
+Table created : podcast_episodes
+Migration file database\migrations\2022_01_26_035047_create_podcast_episodes_table.php
+
+Run the migrations
+# php artisan migrate
+Migration table created successfully.
+Migrating: 2014_10_12_000000_create_users_table
+Migrated:  2014_10_12_000000_create_users_table (86.01ms)
+Migrating: 2014_10_12_100000_create_password_resets_table
+Migrated:  2014_10_12_100000_create_password_resets_table (48.68ms)
+Migrating: 2019_08_19_000000_create_failed_jobs_table
+Migrated:  2019_08_19_000000_create_failed_jobs_table (60.75ms)
+Migrating: 2019_12_14_000001_create_personal_access_tokens_table
+Migrated:  2019_12_14_000001_create_personal_access_tokens_table (98.58ms)
+Migrating: 2022_01_26_034236_create_podcasts_table
+Migrated:  2022_01_26_034236_create_podcasts_table (30.00ms)
+Migrating: 2022_01_26_035047_create_podcast_episodes_table
+Migrated:  2022_01_26_035047_create_podcast_episodes_table (38.35ms)
+
+Verifying table structure in MySQL
+mysql> show tables;
++--------------------------+
+| Tables_in_podchaser_test |
++--------------------------+
+| failed_jobs              |
+| migrations               |
+| password_resets          |
+| personal_access_tokens   |
+| podcast_episodes         |
+| podcasts                 |
+| users                    |
++--------------------------+
+
+mysql> describe podcasts;
++--------------+-----------------+------+-----+---------+----------------+
+| Field        | Type            | Null | Key | Default | Extra          |
++--------------+-----------------+------+-----+---------+----------------+
+| id           | bigint unsigned | NO   | PRI | NULL    | auto_increment |
+| title        | varchar(255)    | NO   |     | NULL    |                |
+| artwork_url  | varchar(255)    | NO   |     | NULL    |                |
+| rss_feed_url | varchar(255)    | NO   |     | NULL    |                |
+| description  | varchar(255)    | NO   |     | NULL    |                |
+| language     | varchar(255)    | NO   |     | NULL    |                |
+| website_url  | varchar(255)    | NO   |     | NULL    |                |
+| created_at   | timestamp       | YES  |     | NULL    |                |
+| updated_at   | timestamp       | YES  |     | NULL    |                |
++--------------+-----------------+------+-----+---------+----------------+
+9 rows in set (0.00 sec)
+
+mysql> describe podcast_episodes;
++-------------+-----------------+------+-----+---------+----------------+
+| Field       | Type            | Null | Key | Default | Extra          |
++-------------+-----------------+------+-----+---------+----------------+
+| id          | bigint unsigned | NO   | PRI | NULL    | auto_increment |
+| title       | varchar(255)    | NO   |     | NULL    |                |
+| description | varchar(255)    | NO   |     | NULL    |                |
+| audio_url   | varchar(255)    | NO   |     | NULL    |                |
+| duration    | int             | NO   |     | NULL    |                |
+| episode_url | varchar(255)    | NO   |     | NULL    |                |
+| podcast_id  | int             | NO   |     | NULL    |                |
+| created_at  | timestamp       | YES  |     | NULL    |                |
+| updated_at  | timestamp       | YES  |     | NULL    |                |
++-------------+-----------------+------+-----+---------+----------------+
+9 rows in set (0.01 sec)
+
+Relationships between Podcast & PodcastEpisode
+Podcast -> hasMany( PodcastEpisode )
+PodcastEpisode -> belongsTo( Podcast )
+
+Artisan commands
+
+Create command to test a Podcast URL (if its valid and returns a valid xml)
+# php artisan make:command TestPodcastURL
+Console command created successfully.
+File: App\Console\Command\TestPodcastURL.php
+# php artisan command:test-podcast-url http://localhost
+Trying to get the podcast URL: http://localhost
+
+Create commando to test a Podcast URL for episodes available
+# php artisan make:command TestPodcastEpisodesURL
+Console command created successfully.
+
+Create Helpers to handle communication and xml parsing according with xml format
+
+Helper/ContentsFromURL
+testURL($url) method to try and get a podcast url and parse the header information
+
+testEpisodesURL($url) method to try and get the entire episode list from a rss and list in the Console
+
+# php artisan command:test-podcast-url https://www.omnycontent.com/d/playlist/2b465d4a-14ee-4fbe-a3c2-ac46009a2d5a/b1907157-de93-4ea2-a952-ac700085150f/be1924e3-559d-4f7d-98e5-ac7000851521/podcast.rss
+podcast title التماس
+podcast description بودكاست حواري يناقش المواضيع العامة بمختلف مجالاتها ، يدردش فيه المحاميان محمد البيز وحسان السيف مع ضيوفهم الملهمين في مجالات اهتمامهم مع إضاءات على تأثير القانون عليها، كل ثلاثاء الساعة التاسعة مساءً حلقة جديدة، هذا البودكاست يأتيكم من شبكة مايكس للبودكاست
+podcast url 
+podcast image https://www.omnycontent.com/d/playlist/2b465d4a-14ee-4fbe-a3c2-ac46009a2d5a/b1907157-de93-4ea2-a952-ac700085150f/be1924e3-559d-4f7d-98e5-ac7000851521/image.jpg?t=1605081876&size=Large
+podcast language ar
+
+# php artisan command:test-podcast-episodes-url https://nosleeppodcast.libsyn.com/rss
+episode title NoSleep Podcast S17E08
+episode description It’s Episode 08 of Season 17. Our spells will gr...
+episode url https://www.podtrac.com/pts/redirect.mp3/pdst.fm/e/chrt.fm/track/9DD8D/traffic.megaphone.fm/TPC9024046459.mp3?updated=1642910693
+episode image 
+episode language 
+-------------------------------------
+episode title NoSleep Podcast - Sleepless Decompositions Vol. 8
+episode description The NoSleep Podcast celebrates its 500th episode w...
+episode url https://www.podtrac.com/pts/redirect.mp3/pdst.fm/e/chrt.fm/track/9DD8D/traffic.megaphone.fm/TPC1686551015.mp3?updated=1642308446
+episode image 
+episode language 
+...
+...
+...
+
+# php artisan make:command ImportPodcastToLibrary
+Console command created successfully.
+
+
+
+
+
+Controllers
+
+Create a podcastcontroller for handling all the methods related to podcast
+# php artisan make:controller PodcastsController
+Controller created successfully.
+
+Controller created to handle the episodes logic
+# php artisan make:controller PodcastEpisodesController
+Controller created successfully.
+
+
+References used:
+https://laravel.com/docs/8.x
+https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+https://www.positronx.io/laravel-create-custom-artisan-command-example-tutorial/
+https://dev.to/kingsconsult/how-to-create-laravel-8-helpers-function-global-function-d8n
+https://stackoverflow.com/questions/9135671/curl-command-line-to-get-embedded-files-in-rss-feed
+
+
+Online Resources
+http://jsonviewer.stack.hu/
