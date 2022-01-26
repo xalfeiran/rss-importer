@@ -21,15 +21,21 @@ class ContentsFromURL
         // get the xml file
         $xml = file_get_contents( $url );
         // the thing with the namespace and the simplexml_load_string
+        
         $xml = str_replace('<itunes:new-feed-url>', '<newfeedurl>', $xml);
         $xml = str_replace('</itunes:new-feed-url>', '</newfeedurl>', $xml);
-        // parse the xml file
-        $xml = simplexml_load_string( $xml );
-        // get the podcast information
-        $podcast = self::getPodcastInformation( $xml );
-        // return the podcast information
-        return $podcast;
-        
+
+        // try catch if the xml is not valid
+        try {
+             // parse the xml file
+            $xml = simplexml_load_string( $xml );
+            // get the podcast information
+            $podcast = self::getPodcastInformation( $xml );
+            // return the podcast information
+            return $podcast;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     // try to get podcast episodes information from a xml file

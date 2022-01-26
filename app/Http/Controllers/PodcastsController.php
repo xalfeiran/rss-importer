@@ -62,6 +62,7 @@ class PodcastsController extends Controller
     {
         // get the podcast information
         $podcast_url = $request->podcast_url;
+
         // call the podcast creation
         $podcast = $this->create($podcast_url);
 

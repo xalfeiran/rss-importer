@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Http\Controllers\PodcastsController;
 
-class TestURL extends TestCase
+class URLTest extends TestCase
 {
     /**
      * A basic test example.
@@ -16,7 +16,7 @@ class TestURL extends TestCase
      */
     public function test_url()
     {
-        $podcast_url = 'https://feeds.simplecast.com/54nAGcIl';
+        $podcast_url = 'https://feeds.megaphone.fm/VMP5705694065';
         
         // call podcast controller to test podcast url
         $controller = new PodcastsController();

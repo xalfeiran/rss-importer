@@ -16,7 +16,7 @@ class ImportPodcastTest extends TestCase
      */
     public function test_import()
     {
-        $podcast_url = 'https://feeds.simplecast.com/54nAGcIl';
+        $podcast_url = 'https://1feeds.simplecast.com/54nAGcIl';
         
         // call podcast controller to test podcast url
         $controller = new PodcastsController();
